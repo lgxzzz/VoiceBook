@@ -5,18 +5,11 @@
     android:orientation="vertical"
     android:fitsSystemWindows="true"
     >
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="收入"
-        android:textSize="30dp"
-        android:layout_margin="10dp"
-        />
     <Spinner
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/sp_cost"
-        android:visibility="gone"
+        android:id="@+id/income_exp_sp"
+        android:layout_margin="10dp"
         >
     </Spinner>
     <LinearLayout
@@ -41,7 +34,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="5dp"
             android:layout_weight="1"
-            android:id="@+id/reg_name_ed"
+            android:id="@+id/reg_date_ed"
             android:background="@drawable/backgroud1"
             >
 
@@ -64,16 +57,16 @@
             >
 
         </TextView>
-        <EditText
+        <Spinner
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="5dp"
-            android:id="@+id/reg_password_ed"
+            android:id="@+id/type_sp"
             android:layout_weight="1"
             android:background="@drawable/backgroud1"
             >
 
-        </EditText>
+        </Spinner>
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
@@ -99,6 +92,7 @@
             android:id="@+id/add_money_ed"
             android:layout_weight="1"
             android:background="@drawable/backgroud1"
+            android:inputType="number"
             >
 
         </EditText>
