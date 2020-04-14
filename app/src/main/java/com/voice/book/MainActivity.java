@@ -35,8 +35,6 @@ public class MainActivity extends BaseActivtiy {
             }
         });
 
-
-
         mBottomMenu.setSelectedItemId(R.id.bottom_menu_garage);
 
     }
