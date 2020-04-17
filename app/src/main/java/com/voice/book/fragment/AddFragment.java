@@ -42,7 +42,7 @@ public class AddFragment extends Fragment{
     DatePickDialog mDatePickDialog;
 
     String mType;
-
+    Button mAddTypeBtn;
     Button mAddBtn;
 
     Budget mBudget;
@@ -74,6 +74,7 @@ public class AddFragment extends Fragment{
         mNumEd = view.findViewById(R.id.add_money_ed);
         mNoteEd = view.findViewById(R.id.add_note_ed);
         mAddBtn = view.findViewById(R.id.add_sure_btn);
+        mAddTypeBtn = view.findViewById(R.id.add_type_btn);
 
 
         final ArrayList<String> mInExpType=new ArrayList<String>();
@@ -166,6 +167,13 @@ public class AddFragment extends Fragment{
 
                     }
                 });
+            }
+        });
+
+        mAddTypeBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
             }
         });
 

@@ -67,6 +67,14 @@
             >
 
         </Spinner>
+        <Button
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/add_type"
+            android:id="@+id/add_type_btn"
+            android:layout_gravity="center"
+            android:gravity="center"
+            />
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
