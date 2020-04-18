@@ -6,17 +6,24 @@ import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.othershe.calendarview.bean.DateBean;
 import com.othershe.calendarview.listener.OnPagerChangeListener;
 import com.othershe.calendarview.weiget.CalendarView;
 import com.voice.book.R;
+import com.voice.book.bean.BudgetType;
+import com.voice.book.data.DBManger;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 
-public class TypeDialog extends Dialog {
+public class AddTypeDialog extends Dialog {
 
     private boolean iscancelable;//控制点击dialog外部是否dismiss
     private boolean isBackCancelable;//控制返回键是否dismiss
@@ -24,13 +31,14 @@ public class TypeDialog extends Dialog {
     private Context context;
     private Button mSureBtn;
     private Button mCancelBtn;
-    private CalendarView mCalendarView;
-    public void setlistener(IOnSelectListener mlistener) {
+    private Spinner mTypeSp;
+    private EditText mNoteEd;
+    public void setlistener(IOnSureListener mlistener) {
         this.mlistener = mlistener;
     }
 
-    IOnSelectListener mlistener;
-    public TypeDialog(Context context, int layoutid, boolean isCancelable, boolean isBackCancelable) {
+    IOnSureListener mlistener;
+    public AddTypeDialog(Context context, int layoutid, boolean isCancelable, boolean isBackCancelable) {
         super(context, R.style.MyDialog);
 
         this.context = context;
@@ -56,24 +64,24 @@ public class TypeDialog extends Dialog {
         mSureBtn = view.findViewById(R.id.sure_btn);
         mCancelBtn = view.findViewById(R.id.cancel_btn);
 
-        mCalendarView = findViewById(R.id.calendar);
-        mCalendarView.setStartEndDate("2020.1", "2027.12").setInitDate(getCurrentDate()).setSingleDate(getCurrentDay()).init();
+        mTypeSp = view.findViewById(R.id.spinner_type);
+        mNoteEd = view.findViewById(R.id.add_type_note_ed);
 
-        //月份切换回调
-        mCalendarView.setOnPagerChangeListener(new OnPagerChangeListener() {
-            @Override
-            public void onPagerChanged(int[] date) {
-
-            }
-        });
 
 
         mSureBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                String note = mNoteEd.getEditableText().toString();
+                if (note.length() == 0){
+                    Toast.makeText(getContext(),"请输入说明！",Toast.LENGTH_LONG).show();
+                    return;
+                }
+                DBManger.getInstance(getContext()).insertBudgetType(mTypeSp.getSelectedItem().toString(),note);
+                if (mlistener!=null){
+                    mlistener.onSure();
+                }
                 dismiss();
-                DateBean bean = mCalendarView.getSingleDate();
-                mlistener.onSelect(bean.getSolar());
             }
         });
 
@@ -81,31 +89,17 @@ public class TypeDialog extends Dialog {
             @Override
             public void onClick(View v) {
                 dismiss();
-
             }
         });
 
+        final ArrayList<String> mInExpType=new ArrayList<String>();
+        mInExpType.add("收入");
+        mInExpType.add("支出");
+        SpinnerAdapter adapter = new SpinnerAdapter(getContext(),android.R.layout.simple_spinner_item,mInExpType);
+        mTypeSp.setAdapter(adapter);
     }
 
-    public interface IOnSelectListener{
-        public void onSelect(int[] date);
-    }
-
-    public String getCurrentDate(){
-        Calendar calendar = Calendar.getInstance();
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH)+1;
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
-        String date = year+"."+month;
-        return date;
-    }
-
-    public String getCurrentDay(){
-        Calendar calendar = Calendar.getInstance();
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH)+1;
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
-        String date = year+"."+month+"."+day;
-        return date;
+    public interface IOnSureListener{
+        public void onSure();
     }
 }

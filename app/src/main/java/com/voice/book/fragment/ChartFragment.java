@@ -14,7 +14,11 @@ import android.text.style.StyleSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
 
 
 import com.github.mikephil.charting.animation.Easing;
@@ -36,9 +40,16 @@ import com.github.mikephil.charting.utils.ColorTemplate;
 import com.github.mikephil.charting.utils.Fill;
 import com.github.mikephil.charting.utils.MPPointF;
 import com.voice.book.R;
+import com.voice.book.adpater.DailySummaryAdapter;
+import com.voice.book.bean.Budget;
+import com.voice.book.bean.DailySummary;
 import com.voice.book.chart.DayAxisValueFormatter;
 import com.voice.book.chart.MyValueFormatter;
 import com.voice.book.chart.XYMarkerView;
+import com.voice.book.data.DBManger;
+import com.voice.book.util.DateUtil;
+import com.voice.book.view.DatePickDialog;
+import com.voice.book.view.SpinnerAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,6 +63,18 @@ public class ChartFragment extends Fragment{
     protected Typeface tfLight;
 
     private PieChart mPiechart;
+
+    private Spinner mTypeSp;
+
+    private TextView mYearTv;
+
+    private DatePickDialog mDatePickDialog;
+
+    private List<DailySummary> mAlldailySummaries = new ArrayList<>();
+    private List<DailySummary> mSelectMonthSummaries = new ArrayList<>();
+
+    private String mCurrentBudgetType = "收入";
+    private String mCurrentDate = DateUtil.getCurrentDayStr();
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -178,13 +201,86 @@ public class ChartFragment extends Fragment{
         mPiechart.setEntryLabelColor(Color.WHITE);
         mPiechart.setEntryLabelTypeface(tfRegular);
         mPiechart.setEntryLabelTextSize(12f);
+
+
+        mTypeSp = view.findViewById(R.id.spinner_type);
+
+        final ArrayList<String> mInExpType=new ArrayList<String>();
+        mInExpType.add("收入");
+        mInExpType.add("支出");
+        SpinnerAdapter adapter = new SpinnerAdapter(getContext(),android.R.layout.simple_spinner_item,mInExpType);
+        mTypeSp.setAdapter(adapter);
+        mTypeSp.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                refreshDataByBudgetType(mInExpType.get(i));
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        mYearTv = view.findViewById(R.id.date_tv);
+
+        mYearTv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mDatePickDialog.show();
+            }
+        });
+
+        mDatePickDialog = new DatePickDialog(getContext(),R.layout.dialog_date,true,true);
+        mDatePickDialog.setlistener(new DatePickDialog.IOnSelectListener() {
+            @Override
+            public void onSelect(final int[] date) {
+                String datestr = date[0]+"年"+date[1]+"月";
+                Toast.makeText(getContext(),"选择月份："+datestr,Toast.LENGTH_LONG).show();
+                refresDataByMonth(datestr);
+            }
+        });
     };
 
-    public void initData(){
-        setData(20, 30);
-        setPieData(4,10);
-        chart.invalidate();
+    public void refreshDataByBudgetType(String type){
+        mCurrentBudgetType = type;
+        refreshBarChart();
+        refreshPieChart();
+    }
+
+    public void refresDataByMonth(String datestr){
+        mCurrentDate = datestr;
+        mYearTv.setText(datestr);
+        mAlldailySummaries.clear();
+        mAlldailySummaries = DBManger.getInstance(getContext()).getAllDailyData();
+        mSelectMonthSummaries.clear();
+        for (int i=0;i<mAlldailySummaries.size();i++){
+            DailySummary summary = mAlldailySummaries.get(i);
+            List<Budget> budgets = summary.getmBudgets();
+            String date = summary.getDate();
+            if (date.contains(datestr)){
+                mSelectMonthSummaries.add(summary);
+            }
+        }
+        refreshBarChart();
+        refreshPieChart();
     };
+
+
+    public void initData(){
+        refresDataByMonth(DateUtil.getCurrentMonthStr());
+    };
+
+    //刷新柱形图
+    public void refreshBarChart(){
+        setData(20, 30);
+        chart.invalidate();
+    }
+
+    //刷新环形图
+    public void refreshPieChart(){
+        setPieData(4,10);
+    }
 
     private void setData(int count, float range) {
 

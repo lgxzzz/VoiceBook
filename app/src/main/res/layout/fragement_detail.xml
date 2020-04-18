@@ -16,15 +16,30 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             >
-            <TextView
+            <LinearLayout
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:orientation="horizontal"
+                >
+             <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:textSize="20dp"
                 android:text="2020年"
                 android:gravity="center"
                 android:id="@+id/year_tv"
                 />
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/pop_arrow"
+                    >
+                </ImageView>
+            </LinearLayout>
+
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -52,9 +67,9 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:textSize="20dp"
-                android:text="04月05日"
+                android:text="04月"
                 android:gravity="center"
-                android:id="@+id/date_tv"
+                android:id="@+id/month_tv"
                 />
             <TextView
                 android:layout_width="0dp"

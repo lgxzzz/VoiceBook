@@ -10,7 +10,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="收入类型："
+        android:text="收支类型："
         android:layout_gravity="left"
         android:layout_margin="10dp"
         >
@@ -20,31 +20,16 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:id="@+id/income_type_listview"
+        android:id="@+id/income_ex_type_listview"
         >
 
     </ListView>
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="支出类型："
-        android:layout_gravity="left"
-        android:layout_margin="10dp"
-        >
 
-    </TextView>
-    <ListView
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:id="@+id/expense_type_listview"
-        >
-    </ListView>
     <Button
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         android:background="@drawable/add_type"
-        android:id="@+id/add_type"
+        android:id="@+id/add_type_btn"
         android:layout_margin="10dp"
         ></Button>
 </LinearLayout>

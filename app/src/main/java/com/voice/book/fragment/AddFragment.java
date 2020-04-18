@@ -1,6 +1,7 @@
 package com.voice.book.fragment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -21,11 +22,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.voice.book.AddTypeActivity;
+import com.voice.book.LoginActivity;
 import com.voice.book.R;
+import com.voice.book.SplashActivity;
 import com.voice.book.bean.Budget;
 import com.voice.book.data.DBManger;
 import com.voice.book.util.DateUtil;
 import com.voice.book.view.DatePickDialog;
+import com.voice.book.view.SpinnerAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -173,7 +178,7 @@ public class AddFragment extends Fragment{
         mAddTypeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                startActivity(new Intent(getContext(), AddTypeActivity.class));
             }
         });
 
@@ -181,7 +186,7 @@ public class AddFragment extends Fragment{
     };
 
     public void initData() {
-
+        refreshBudgetType();
     }
 
     public void refreshBudgetType(){
@@ -205,54 +210,5 @@ public class AddFragment extends Fragment{
         mBudget.setBudegetTypeId(budgetid);
     }
 
-    private class SpinnerAdapter extends ArrayAdapter<String> {
-        Context context;
-        ArrayList<String> objects = new ArrayList<>();
 
-        public SpinnerAdapter(final Context context,
-                              final int textViewResourceId, final ArrayList<String> objects) {
-            super(context, textViewResourceId, objects);
-            this.objects = objects;
-            this.context = context;
-        }
-
-        @Override
-        public View getDropDownView(int position, View convertView,
-                                    ViewGroup parent) {
-
-            if (convertView == null) {
-                LayoutInflater inflater = LayoutInflater.from(context);
-                convertView = inflater.inflate(
-                        android.R.layout.simple_spinner_item, parent, false);
-            }
-
-            TextView tv = (TextView) convertView
-                    .findViewById(android.R.id.text1);
-            tv.setText(objects.get(position));
-            tv.setGravity(Gravity.CENTER);
-            tv.setTextColor(Color.BLUE);
-            tv.setTextSize(30);
-            return convertView;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            if (convertView == null) {
-                LayoutInflater inflater = LayoutInflater.from(context);
-                convertView = inflater.inflate(
-                        android.R.layout.simple_spinner_item, parent, false);
-            }
-
-            // android.R.id.text1 is default text view in resource of the android.
-            // android.R.layout.simple_spinner_item is default layout in resources of android.
-
-            TextView tv = (TextView) convertView
-                    .findViewById(android.R.id.text1);
-            tv.setText(objects.get(position));
-            tv.setGravity(Gravity.CENTER);
-            tv.setTextColor(Color.BLUE);
-            tv.setTextSize(30);
-            return convertView;
-        }
-    }
 }

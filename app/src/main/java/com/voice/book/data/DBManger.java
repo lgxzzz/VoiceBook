@@ -130,7 +130,14 @@ public class DBManger {
             }
             SharedPreferenceUtil.setFirstTimeUse(false,mContext);
         }
+    }
 
+    public void insertBudgetType(String type,String note){
+        BudgetType budgetType =new BudgetType();
+        budgetType.setType(type);
+        budgetType.setNote(note);
+        budgetType.setBudegetTypeId(getRandomBudgettypeId());
+        insertBudgetType(budgetType);
     }
 
     //添加收支数据
@@ -184,8 +191,8 @@ public class DBManger {
         return strRand;
     }
 
-    //获取每日的汇总数据
-    public List<DailySummary> getDailyData(){
+    //获取所有的日期的汇总数据
+    public List<DailySummary> getAllDailyData(){
         List<DailySummary> dailySummaries = new ArrayList<>();
         HashMap<String,List<Budget>> mTempData = new HashMap<>();
         try{
@@ -234,6 +241,7 @@ public class DBManger {
         return dailySummaries;
     };
 
+    //根据type类型获取收支说明
     public ArrayList<String> getBudgetTypeByKey(String type){
         ArrayList<String> types = new ArrayList<>();
         try{
@@ -281,6 +289,64 @@ public class DBManger {
             e.printStackTrace();
         }
         return note;
+    }
+
+    //获取对应的收支类型数据
+    public List<BudgetType> getBudgetTypeByType(String type){
+        List<BudgetType> mBudgetType = new ArrayList<>();
+        try{
+            SQLiteDatabase db = mDBHelper.getWritableDatabase();
+            Cursor cursor = db.rawQuery("select * from BudgetType where type =?",new String[]{type});
+            while (cursor.moveToNext()){
+                String BudegetTypeId = cursor.getString(cursor.getColumnIndex("BudegetTypeId"));
+                String note = cursor.getString(cursor.getColumnIndex("note"));
+
+                BudgetType budgetType = new BudgetType();
+                budgetType.setBudegetTypeId(BudegetTypeId);
+                budgetType.setNote(note);
+                budgetType.setType(type);
+                mBudgetType.add(budgetType);
+            }
+            db.close();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return mBudgetType;
+    }
+
+    //获取对应的收支类型数据
+    public List<BudgetType> getAllBudgetType(){
+        List<BudgetType> mBudgetType = new ArrayList<>();
+        try{
+            SQLiteDatabase db = mDBHelper.getWritableDatabase();
+            Cursor cursor = db.query(SQLiteDbHelper.TAB_BUDGET_TYPE,null,null,null,null,null,null);
+            while (cursor.moveToNext()){
+                String BudegetTypeId = cursor.getString(cursor.getColumnIndex("BudegetTypeId"));
+                String note = cursor.getString(cursor.getColumnIndex("note"));
+                String type = cursor.getString(cursor.getColumnIndex("type"));
+
+                BudgetType budgetType = new BudgetType();
+                budgetType.setBudegetTypeId(BudegetTypeId);
+                budgetType.setNote(note);
+                budgetType.setType(type);
+                mBudgetType.add(budgetType);
+            }
+            db.close();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return mBudgetType;
+    }
+
+    //根据BudegetTypeId删除数据
+    public void deleteBudegetTypeById(String BudegetTypeId){
+        try{
+            SQLiteDatabase db = mDBHelper.getWritableDatabase();
+            int x = db.delete(SQLiteDbHelper.TAB_BUDGET_TYPE,"BudegetTypeId =?",new String[]{BudegetTypeId});
+            db.close();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public interface IListener{

@@ -56,8 +56,8 @@ public class DailySummaryAdapter extends BaseAdapter{
             holer = (ViewHoler) view.getTag();
         }
         holer.mDateTv.setText(dailySummary.getDate());
-        holer.mIncomeTv.setText(dailySummary.getIncome());
-        holer.mExpenseTV.setText(dailySummary.getExpense());
+        holer.mIncomeTv.setText("收入:"+dailySummary.getIncome());
+        holer.mExpenseTV.setText("支出:"+dailySummary.getExpense());
         for (int i=0;i<dailySummary.getmBudgets().size();i++){
             Budget budget= dailySummary.getmBudgets().get(i);
             View item = LayoutInflater.from(mContext).inflate(R.layout.budget_item,null);

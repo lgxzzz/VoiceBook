@@ -114,7 +114,6 @@ public class DatePickDialog extends Dialog {
         });
     }
 
-
     public interface IOnSelectListener{
         public void onSelect(int[] date);
     }

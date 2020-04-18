@@ -30,6 +30,15 @@ public class DateUtil {
         return date;
     }
 
+    public static String getCurrentMonthStr(){
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH)+1;
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        String date = year+"年"+month+"月";
+        return date;
+    }
+
     public static int[] getIntDay(){
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);

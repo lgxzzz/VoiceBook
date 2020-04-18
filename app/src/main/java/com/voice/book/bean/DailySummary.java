@@ -1,10 +1,11 @@
 package com.voice.book.bean;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class DailySummary {
   String date;
-  List<Budget> mBudgets;
+  List<Budget> mBudgets = new ArrayList<>();
 
     public String getDate() {
         return date;
@@ -22,11 +23,24 @@ public class DailySummary {
         this.mBudgets = mBudgets;
     }
 
-    public String getIncome(){
-        return null;
+    public int getIncome(){
+        return getCountByBudgetType("收入");
     }
 
-    public String getExpense(){
-        return null;
+    public int getExpense(){
+        return getCountByBudgetType("支出");
     };
+
+    public int getCountByBudgetType(String type){
+        int number = 0;
+        for (int i=0;i<mBudgets.size();i++){
+            Budget budget = mBudgets.get(i);
+            String temp = budget.getType();
+            if (temp.equals(type)){
+                int num = Integer.parseInt(budget.getNum());
+                number = number+num;
+            }
+        }
+        return number;
+    }
 }
