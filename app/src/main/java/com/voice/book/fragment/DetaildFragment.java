@@ -6,6 +6,8 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatDialogFragment;
+import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,17 +18,19 @@ import android.widget.Toast;
 
 import com.voice.book.R;
 import com.voice.book.adpater.DailySummaryAdapter;
+import com.voice.book.adpater.SummaryAdapter;
 import com.voice.book.bean.Budget;
 import com.voice.book.bean.DailySummary;
 import com.voice.book.data.DBManger;
 import com.voice.book.util.DateUtil;
 import com.voice.book.view.DatePickDialog;
+import com.voice.book.view.LeftSwipeMenuRecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class DetaildFragment extends Fragment{
+public class DetaildFragment extends AppCompatDialogFragment{
 
     private TextView mYearTv;
     private TextView mMonthTv;
@@ -34,8 +38,8 @@ public class DetaildFragment extends Fragment{
     private TextView mExpenseTv;
     private DatePickDialog mDatePickDialog;
 
-    private ListView mDailyListview;
-    private DailySummaryAdapter mAdapter;
+    private LeftSwipeMenuRecyclerView mDailyListview;
+    private SummaryAdapter mAdapter;
 
     private Handler mHandler= new Handler();
 
@@ -135,7 +139,27 @@ public class DetaildFragment extends Fragment{
                 mSelectDateSummaries.add(summary);
             }
         }
-        mAdapter = new DailySummaryAdapter(getContext(),mSelectDateSummaries);
+        mDailyListview.setLayoutManager(new LinearLayoutManager(getContext()));
+        mAdapter = new SummaryAdapter(getContext(),mSelectDateSummaries);
         mDailyListview.setAdapter(mAdapter);
+        mDailyListview.setOnItemActionListener(new LeftSwipeMenuRecyclerView.OnItemActionListener() {
+            //点击
+            @Override
+            public void OnItemClick(int position) {
+                Toast.makeText(getContext(),"Click"+position,Toast.LENGTH_SHORT).show();
+            }
+            //置顶
+            @Override
+            public void OnItemTop(int position) {
+
+            }
+            //删除
+            @Override
+            public void OnItemDelete(int position) {
+                DBManger.getInstance(getContext()).deleteBudegetByDialy(mSelectDateSummaries.get(position));
+
+                initAllData();
+            }
+        });
     }
 }

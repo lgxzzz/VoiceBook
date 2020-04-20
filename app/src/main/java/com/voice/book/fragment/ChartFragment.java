@@ -101,55 +101,13 @@ public class ChartFragment extends Fragment{
 
         // if more than 60 entries are displayed in the chart, no values will be
         // drawn
-        chart.setMaxVisibleValueCount(60);
+
 
         // scaling can now only be done on x- and y-axis separately
         chart.setPinchZoom(false);
 
         chart.setDrawGridBackground(false);
-        // chart.setDrawYLabels(false);
 
-        ValueFormatter xAxisFormatter = new DayAxisValueFormatter(chart);
-
-        XAxis xAxis = chart.getXAxis();
-        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxis.setTypeface(tfLight);
-        xAxis.setDrawGridLines(false);
-        xAxis.setGranularity(1f); // only intervals of 1 day
-        xAxis.setLabelCount(7);
-        xAxis.setValueFormatter(xAxisFormatter);
-
-        ValueFormatter custom = new MyValueFormatter("$");
-
-        YAxis leftAxis = chart.getAxisLeft();
-        leftAxis.setTypeface(tfLight);
-        leftAxis.setLabelCount(8, false);
-        leftAxis.setValueFormatter(custom);
-        leftAxis.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
-        leftAxis.setSpaceTop(15f);
-        leftAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
-
-        YAxis rightAxis = chart.getAxisRight();
-        rightAxis.setDrawGridLines(false);
-        rightAxis.setTypeface(tfLight);
-        rightAxis.setLabelCount(8, false);
-        rightAxis.setValueFormatter(custom);
-        rightAxis.setSpaceTop(15f);
-        rightAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
-
-        Legend l = chart.getLegend();
-        l.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
-        l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.LEFT);
-        l.setOrientation(Legend.LegendOrientation.HORIZONTAL);
-        l.setDrawInside(false);
-        l.setForm(Legend.LegendForm.SQUARE);
-        l.setFormSize(9f);
-        l.setTextSize(11f);
-        l.setXEntrySpace(4f);
-
-        XYMarkerView mv = new XYMarkerView(getContext(), xAxisFormatter);
-        mv.setChartView(chart); // For bounds control
-        chart.setMarker(mv); // Set the marker to the chart
 
 
 
@@ -162,7 +120,7 @@ public class ChartFragment extends Fragment{
         mPiechart.setDragDecelerationFrictionCoef(0.95f);
 
         mPiechart.setCenterTextTypeface(tfLight);
-        mPiechart.setCenterText(generateCenterSpannableText());
+
 
         mPiechart.setDrawHoleEnabled(true);
         mPiechart.setHoleColor(Color.WHITE);
@@ -272,31 +230,60 @@ public class ChartFragment extends Fragment{
     };
 
     //刷新柱形图
-    public void refreshBarChart(){
-        setData(20, 30);
-        chart.invalidate();
-    }
-
-    //刷新环形图
-    public void refreshPieChart(){
-        setPieData(4,10);
-    }
-
-    private void setData(int count, float range) {
-
-        float start = 1f;
+    private void refreshBarChart() {
 
         ArrayList<BarEntry> values = new ArrayList<>();
 
-        for (int i = (int) start; i < start + count; i++) {
-            float val = (float) (Math.random() * (range + 1));
-
-            if (Math.random() * 100 < 25) {
-                values.add(new BarEntry(i, val, getResources().getDrawable(R.drawable.star)));
-            } else {
-                values.add(new BarEntry(i, val));
-            }
+        int days = DateUtil.getMonthOfDay(mCurrentDate);
+        for (int i=1;i<=days;i++){
+            int number = caluteNumberByDate(i);
+            BarEntry barEntry = new BarEntry(i,number);
+            values.add(barEntry);
         }
+
+        // chart.setDrawYLabels(false);
+        chart.setMaxVisibleValueCount(days);
+        ValueFormatter xAxisFormatter = new DayAxisValueFormatter(chart);
+
+        XAxis xAxis = chart.getXAxis();
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setTypeface(tfLight);
+        xAxis.setDrawGridLines(false);
+        xAxis.setGranularity(1f); // only intervals of 1 day
+        xAxis.setLabelCount(7);
+        xAxis.setValueFormatter(xAxisFormatter);
+
+        ValueFormatter custom = new MyValueFormatter("元");
+
+        YAxis leftAxis = chart.getAxisLeft();
+        leftAxis.setTypeface(tfLight);
+        leftAxis.setLabelCount(8, false);
+        leftAxis.setValueFormatter(custom);
+        leftAxis.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART);
+        leftAxis.setSpaceTop(15f);
+        leftAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
+
+        YAxis rightAxis = chart.getAxisRight();
+        rightAxis.setDrawGridLines(false);
+        rightAxis.setTypeface(tfLight);
+        rightAxis.setLabelCount(8, false);
+        rightAxis.setValueFormatter(custom);
+        rightAxis.setSpaceTop(15f);
+        rightAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
+
+        Legend l = chart.getLegend();
+        l.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
+        l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.LEFT);
+        l.setOrientation(Legend.LegendOrientation.HORIZONTAL);
+        l.setDrawInside(false);
+        l.setForm(Legend.LegendForm.SQUARE);
+        l.setFormSize(9f);
+        l.setTextSize(11f);
+        l.setXEntrySpace(4f);
+
+        XYMarkerView mv = new XYMarkerView(getContext(), xAxisFormatter);
+        mv.setChartView(chart); // For bounds control
+        chart.setMarker(mv); // Set the marker to the chart
 
         BarDataSet set1;
 
@@ -341,27 +328,27 @@ public class ChartFragment extends Fragment{
             data.setBarWidth(0.9f);
 
             chart.setData(data);
+
         }
+        chart.invalidate();
     }
 
-    protected final String[] parties = new String[] {
-            "Party A", "Party B", "Party C", "Party D", "Party E", "Party F", "Party G", "Party H",
-            "Party I", "Party J", "Party K", "Party L", "Party M", "Party N", "Party O", "Party P",
-            "Party Q", "Party R", "Party S", "Party T", "Party U", "Party V", "Party W", "Party X",
-            "Party Y", "Party Z"
-    };
-    private void setPieData(int count, float range) {
+    //刷新环形图
+    private void refreshPieChart() {
+        final ArrayList<String> mParties= DBManger.getInstance(getContext()).getBudgetTypeByKey(mCurrentBudgetType);
+
         ArrayList<PieEntry> entries = new ArrayList<>();
 
         // NOTE: The order of the entries when being added to the entries array determines their position around the center of
         // the chart.
-        for (int i = 0; i < count ; i++) {
-            entries.add(new PieEntry((float) ((Math.random() * range) + range / 5),
-                    parties[i % parties.length],
-                    getResources().getDrawable(R.drawable.star)));
+        for (int i = 0; i < mParties.size() ; i++) {
+            String label = mParties.get(i);
+            long number = caluteNumberByBudgetType(label);
+            PieEntry pieEntry = new PieEntry(number,label);
+            entries.add(pieEntry);
         }
 
-        PieDataSet dataSet = new PieDataSet(entries, "Election Results");
+        PieDataSet dataSet = new PieDataSet(entries, "类别明细");
 
         dataSet.setDrawIcons(false);
 
@@ -402,25 +389,72 @@ public class ChartFragment extends Fragment{
 
         // undo all highlights
         mPiechart.highlightValues(null);
-
+        mPiechart.setCenterText(generateCenterSpannableText());
         mPiechart.invalidate();
     }
 
 
     private SpannableString generateCenterSpannableText() {
 
-        SpannableString s = new SpannableString("MPAndroidChart\ndeveloped by Philipp Jahoda");
-        s.setSpan(new RelativeSizeSpan(1.7f), 0, 14, 0);
-        s.setSpan(new StyleSpan(Typeface.NORMAL), 14, s.length() - 15, 0);
-        s.setSpan(new ForegroundColorSpan(Color.GRAY), 14, s.length() - 15, 0);
-        s.setSpan(new RelativeSizeSpan(.8f), 14, s.length() - 15, 0);
-        s.setSpan(new StyleSpan(Typeface.ITALIC), s.length() - 14, s.length(), 0);
-        s.setSpan(new ForegroundColorSpan(ColorTemplate.getHoloBlue()), s.length() - 14, s.length(), 0);
+        SpannableString s = new SpannableString(mCurrentBudgetType);
+        s.setSpan(new RelativeSizeSpan(1.7f), 0, 2, 0);
+//        s.setSpan(new StyleSpan(Typeface.NORMAL), 14, s.length() - 15, 0);
+//        s.setSpan(new ForegroundColorSpan(Color.GRAY), 14, s.length() - 15, 0);
+//        s.setSpan(new RelativeSizeSpan(.8f), 14, s.length() - 15, 0);
+//        s.setSpan(new StyleSpan(Typeface.ITALIC), s.length() - 14, s.length(), 0);
+//        s.setSpan(new ForegroundColorSpan(ColorTemplate.getHoloBlue()), s.length() - 14, s.length(), 0);
         return s;
     }
     @Override
     public void onResume() {
         super.onResume();
         initData();
+    }
+
+    //根据收支类别统计一个月的数目
+    public long caluteNumberByBudgetType(String type){
+        int all_cout = 0;
+        for (int i= 0;i<mSelectMonthSummaries.size();i++){
+            DailySummary dailySummary = mSelectMonthSummaries.get(i);
+            List<Budget> budgets = dailySummary.getmBudgets();
+            for (int j= 0;j<budgets.size();j++){
+                Budget budget = budgets.get(j);
+                String budgettype = DBManger.getInstance(getContext()).getBudgetTypeByID(budget.getBudegetTypeId());
+                if (budgettype.equals(type)){
+                    all_cout = all_cout+ Integer.parseInt(budget.getNum());
+                }
+            }
+        }
+        return all_cout;
+    }
+
+    //根据日期获取当天的收支数目
+    public int caluteNumberByDate(int day){
+        int all_cout = 0;
+        for (int i= 0;i<mSelectMonthSummaries.size();i++){
+            DailySummary dailySummary = mSelectMonthSummaries.get(i);
+            List<Budget> budgets = dailySummary.getmBudgets();
+            for (int j= 0;j<budgets.size();j++){
+                Budget budget = budgets.get(j);
+                String type = budget.getType();
+                String date = budget.getDate();
+                if (type.equals(mCurrentBudgetType)&&isThisDay(day,date)){
+                    all_cout = all_cout+ Integer.parseInt(budget.getNum());
+                }
+            }
+        }
+        return all_cout;
+    }
+
+    public boolean isThisDay(int day,String date){
+        String time = date.replace("年","-").replace("月","-").replace("日","");
+        String[] temp = time.split("-");
+        int year = Integer.parseInt(temp[0]);
+        int month = Integer.parseInt(temp[1]);
+        int tempday = Integer.parseInt(temp[2]);
+        if (tempday == day){
+            return true;
+        }
+        return false;
     }
 }

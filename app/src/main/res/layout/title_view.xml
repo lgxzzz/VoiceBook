@@ -12,7 +12,7 @@
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
         android:layout_margin="3dp"
-        android:background="@mipmap/ic_launcher"
+        android:background="@drawable/touxiang"
         />
     <TextView
         android:layout_width="wrap_content"

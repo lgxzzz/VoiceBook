@@ -212,6 +212,7 @@ public class DBManger {
                 budget.setType(type);
                 budget.setNote(note);
                 budget.setNum(num);
+                budget.setDate(date);
 
                 if (!mTempData.containsKey(date)){
                     List<Budget> budgets = new ArrayList<>();
@@ -232,9 +233,6 @@ public class DBManger {
                 dailySummary.setmBudgets((List<Budget>)entry.getValue());
                 dailySummaries.add(dailySummary);
             }
-
-
-
             }catch (Exception e){
             e.printStackTrace();
         }
@@ -343,6 +341,19 @@ public class DBManger {
         try{
             SQLiteDatabase db = mDBHelper.getWritableDatabase();
             int x = db.delete(SQLiteDbHelper.TAB_BUDGET_TYPE,"BudegetTypeId =?",new String[]{BudegetTypeId});
+            db.close();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public void deleteBudegetByDialy(DailySummary dailySummary){
+        try{
+            SQLiteDatabase db = mDBHelper.getWritableDatabase();
+            for (int i=0;i<dailySummary.getmBudgets().size();i++){
+                Budget budget = dailySummary.getmBudgets().get(i);
+                int x = db.delete(SQLiteDbHelper.TAB_BUDGET,"BudegetId =?",new String[]{budget.getBudegetId()});
+            }
             db.close();
         }catch (Exception e){
             e.printStackTrace();

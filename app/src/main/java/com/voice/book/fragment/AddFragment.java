@@ -23,9 +23,11 @@ import android.widget.Toast;
 
 
 import com.voice.book.AddTypeActivity;
+import com.voice.book.IFlyVoiceArs;
 import com.voice.book.LoginActivity;
 import com.voice.book.R;
 import com.voice.book.SplashActivity;
+import com.voice.book.VoiceActivity;
 import com.voice.book.bean.Budget;
 import com.voice.book.data.DBManger;
 import com.voice.book.util.DateUtil;
@@ -48,9 +50,12 @@ public class AddFragment extends Fragment{
 
     String mType;
     Button mAddTypeBtn;
+    Button mAddVoiceBtn;
     Button mAddBtn;
 
     Budget mBudget;
+
+    IFlyVoiceArs mArs;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -161,6 +166,10 @@ public class AddFragment extends Fragment{
         mAddBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (mNumEd.getEditableText().toString().length()==0){
+                    Toast.makeText(getContext(),"请输入金额！",Toast.LENGTH_LONG).show();
+                    return;
+                }
                 DBManger.getInstance(getContext()).insertBudget(mBudget, new DBManger.IListener() {
                     @Override
                     public void onSuccess() {
@@ -179,6 +188,23 @@ public class AddFragment extends Fragment{
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(getContext(), AddTypeActivity.class));
+            }
+        });
+
+        mAddVoiceBtn = view.findViewById(R.id.add_voice_btn);
+        mAddVoiceBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                startActivity(new Intent(getContext(), VoiceActivity.class));
+                mArs.startListening();
+            }
+        });
+
+        mArs = new IFlyVoiceArs(getContext(), new IFlyVoiceArs.IOnLisener() {
+            @Override
+            public void onAsr(String note, int num) {
+                mNumEd.setText(num+"");
+                mNoteEd.setText(note);
             }
         });
 
