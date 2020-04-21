@@ -11,7 +11,7 @@ public class SQLiteDbHelper extends SQLiteOpenHelper {
     //数据库名称
     public static final String DB_NAME = "VoiceBook.db";
     //数据库版本号
-    public static int DB_VERSION = 7;
+    public static int DB_VERSION = 8;
     //用户表
     public static final String TAB_USER = "UserInfo";
     //收支表
@@ -54,6 +54,7 @@ public class SQLiteDbHelper extends SQLiteOpenHelper {
     public void createTableBudget(SQLiteDatabase db){
         db.execSQL("CREATE TABLE IF NOT EXISTS "+TAB_BUDGET +
                 "(BudegetId integer primary key autoincrement, " +
+                "UserId varchar(60), " +           //用户id
                 "date varchar(60), " +           //日期
                 "type varchar(60), " +           // 支出 收入
                 "BudegetTypeId varchar(60), " +  //收支类型
@@ -65,6 +66,7 @@ public class SQLiteDbHelper extends SQLiteOpenHelper {
     public void createTableBudgetType(SQLiteDatabase db){
         db.execSQL("CREATE TABLE IF NOT EXISTS "+TAB_BUDGET_TYPE +
                 "(BudegetTypeId varchar(60) primary key, " +
+                "UserId varchar(60), " +           //用户id
                 "type varchar(60), " +   // 支出 收入
                 "note varchar(60))");    // 服饰 购物等
     }

@@ -2,9 +2,16 @@ package com.voice.book.bean;
 
 public class BudgetType {
     String type;
+    String UserId;
     String BudegetTypeId;
     String note;
 
+    public String getUserId() {
+        return UserId;
+    }
+    public void setUserId(String userId) {
+        UserId = userId;
+    }
     public String getType() {
         return type;
     }

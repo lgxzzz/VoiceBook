@@ -9,6 +9,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -22,12 +24,15 @@ import android.widget.ImageView;
 import android.widget.PopupWindow;
 
 import com.voice.book.bean.Budget;
+import com.voice.book.bean.User;
 import com.voice.book.data.DBManger;
 import com.voice.book.fragment.AddFragment;
 import com.voice.book.fragment.ChartFragment;
 import com.voice.book.fragment.DetaildFragment;
 import com.voice.book.util.ExcelUtil;
 import com.voice.book.util.FragmentUtils;
+import com.voice.book.util.HeadImgUtil;
+import com.voice.book.util.SharedPreferenceUtil;
 import com.voice.book.view.MenuView;
 
 import java.io.File;
@@ -43,7 +48,10 @@ public class MainActivity extends BaseActivtiy {
     private MenuView mMenuView;
     private ImageView mHeadBtn;
     private Uri mCutUri;
+    PopupWindow popupWindow;
     public static MainActivity _this;
+    private User mUser;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,15 +78,21 @@ public class MainActivity extends BaseActivtiy {
         mMenuBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                PopupWindow popupWindow = new PopupWindow(mMenuView, ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);//参数为1.View 2.宽度 3.高度
                 popupWindow.setOutsideTouchable(true);//设置点击外部区域可以取消popupWindow
                 popupWindow.showAsDropDown(mMenuBtn);//设置popupWindow显示,并且告诉它显示在那个View下面
+                //五秒后关闭弹窗
+                mHandler.removeCallbacksAndMessages(null);
+                mHandler.sendEmptyMessageDelayed(HSG_CLOSE_MENU,5000);
             }
         });
-
+        popupWindow = new PopupWindow(mMenuView, ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);//参数为1.View 2.宽度 3.高度
         mHeadBtn = findViewById(R.id.title_head_btn);
-
+        mUser = DBManger.getInstance(this).mUser;
+        //获取保存的头像
+        Bitmap bitmap = HeadImgUtil.getHeadBitmap(this);
+        if (bitmap!=null){
+            mHeadBtn.setImageBitmap(bitmap);
+        }
     }
 
 
@@ -145,6 +159,8 @@ public class MainActivity extends BaseActivtiy {
                         Bitmap bitmap = BitmapFactory.decodeStream(
                                 getContentResolver().openInputStream(mCutUri));
                         mHeadBtn.setImageBitmap(bitmap);
+                        //保存头像
+                        HeadImgUtil.saveBitmap(bitmap);
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
                     }
@@ -203,14 +219,14 @@ public class MainActivity extends BaseActivtiy {
     }
 
     public void exportExcel(){
-        String filePath = Environment.getExternalStorageDirectory() + "/AndroidExcelDemo";
+        String filePath = Environment.getExternalStorageDirectory() + "/AndroidExcelDemo/";
         File file = new File(filePath);
         if (!file.exists()) {
             file.mkdirs();
         }
 
 
-        String excelFileName = "/demo.xls";
+        String excelFileName = mUser.getUserName()+".xls";
 
 
         String[] title = {"类型", "数目", "时间"};
@@ -225,4 +241,18 @@ public class MainActivity extends BaseActivtiy {
 
         ExcelUtil.writeObjListToExcel(mAllBudgets, filePath, getBaseContext());
     }
+
+    public static final int HSG_CLOSE_MENU = 0;
+
+    public Handler mHandler = new Handler(new Handler.Callback() {
+        @Override
+        public boolean handleMessage(Message message) {
+            switch (message.what){
+                case HSG_CLOSE_MENU:
+                    popupWindow.dismiss();
+                    break;
+            }
+            return false;
+        }
+    });
 }

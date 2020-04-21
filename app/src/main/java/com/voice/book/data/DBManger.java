@@ -112,6 +112,7 @@ public class DBManger {
                 budgetType.setNote(ExpenseType.get(i));
                 budgetType.setType("支出");
                 budgetType.setBudegetTypeId(getRandomBudgettypeId());
+                budgetType.setUserId(mUser.getUserId());
                 insertBudgetType(budgetType);
             }
 
@@ -125,6 +126,7 @@ public class DBManger {
                 budgetType.setNote(IncomeType.get(i));
                 budgetType.setType("收入");
                 budgetType.setBudegetTypeId(getRandomBudgettypeId());
+                budgetType.setUserId(mUser.getUserId());
                 insertBudgetType(budgetType);
             }
             SharedPreferenceUtil.setFirstTimeUse(false,mContext);
@@ -136,6 +138,7 @@ public class DBManger {
         budgetType.setType(type);
         budgetType.setNote(note);
         budgetType.setBudegetTypeId(getRandomBudgettypeId());
+        budgetType.setUserId(mUser.getUserId());
         insertBudgetType(budgetType);
     }
 
@@ -153,6 +156,7 @@ public class DBManger {
         values.put("BudegetTypeId",budget.getBudegetTypeId());
         values.put("note",budget.getNote());
         values.put("num",budget.getNum());
+        values.put("UserId",mUser.getUserId());
         SQLiteDatabase db = mDBHelper.getWritableDatabase();
         int code = db.update(SQLiteDbHelper.TAB_BUDGET,values,"BudegetId =?",new String[]{budget.getBudegetId()+""});
         int x = code;
@@ -168,6 +172,7 @@ public class DBManger {
             values.put("BudegetTypeId",budge.getBudegetTypeId());
             values.put("note",budge.getNote());
             values.put("num",budge.getNum());
+            values.put("UserId",mUser.getUserId());
             SQLiteDatabase db = mDBHelper.getWritableDatabase();
             long code = db.insert(SQLiteDbHelper.TAB_BUDGET,null,values);
             listener.onSuccess();
@@ -214,7 +219,7 @@ public class DBManger {
         List<Budget> budgets = new ArrayList<>();
         try{
             SQLiteDatabase db = mDBHelper.getWritableDatabase();
-            Cursor cursor = db.query(SQLiteDbHelper.TAB_BUDGET,null,null,null,null,null,null);
+            Cursor cursor = db.query(SQLiteDbHelper.TAB_BUDGET,null," UserId=? ",new String[]{mUser.getUserId()},null,null,null);
             while (cursor.moveToNext()){
                 String BudegetId = cursor.getString(cursor.getColumnIndex("BudegetId"));
                 String date = cursor.getString(cursor.getColumnIndex("date"));
@@ -294,7 +299,7 @@ public class DBManger {
         ArrayList<String> types = new ArrayList<>();
         try{
             SQLiteDatabase db = mDBHelper.getWritableDatabase();
-            Cursor cursor = db.rawQuery("select * from BudgetType where type =?",new String[]{type});
+            Cursor cursor = db.rawQuery("select * from BudgetType where type =? and UserId=?",new String[]{type,mUser.getUserId()});
             while (cursor.moveToNext()){
 
                 String note = cursor.getString(cursor.getColumnIndex("note"));
@@ -311,7 +316,7 @@ public class DBManger {
         String BudegetTypeId = null;
         try{
             SQLiteDatabase db = mDBHelper.getWritableDatabase();
-            Cursor cursor = db.rawQuery("select * from BudgetType where note =?",new String[]{note});
+            Cursor cursor = db.rawQuery("select * from BudgetType where note =? and UserId=? ",new String[]{note,mUser.getUserId()});
             while (cursor.moveToNext()){
 
                 BudegetTypeId = cursor.getString(cursor.getColumnIndex("BudegetTypeId"));
@@ -327,7 +332,7 @@ public class DBManger {
         String note = null;
         try{
             SQLiteDatabase db = mDBHelper.getWritableDatabase();
-            Cursor cursor = db.rawQuery("select * from BudgetType where BudegetTypeId =?",new String[]{BudegetTypeId});
+            Cursor cursor = db.rawQuery("select * from BudgetType where BudegetTypeId =? and UserId=?",new String[]{BudegetTypeId,mUser.getUserId()});
             while (cursor.moveToNext()){
 
                 note = cursor.getString(cursor.getColumnIndex("note"));
@@ -344,7 +349,7 @@ public class DBManger {
         List<BudgetType> mBudgetType = new ArrayList<>();
         try{
             SQLiteDatabase db = mDBHelper.getWritableDatabase();
-            Cursor cursor = db.rawQuery("select * from BudgetType where type =?",new String[]{type});
+            Cursor cursor = db.rawQuery("select * from BudgetType where type =? and UserId=?",new String[]{type,mUser.getUserId()});
             while (cursor.moveToNext()){
                 String BudegetTypeId = cursor.getString(cursor.getColumnIndex("BudegetTypeId"));
                 String note = cursor.getString(cursor.getColumnIndex("note"));
@@ -367,7 +372,7 @@ public class DBManger {
         List<BudgetType> mBudgetType = new ArrayList<>();
         try{
             SQLiteDatabase db = mDBHelper.getWritableDatabase();
-            Cursor cursor = db.query(SQLiteDbHelper.TAB_BUDGET_TYPE,null,null,null,null,null,null);
+            Cursor cursor = db.query(SQLiteDbHelper.TAB_BUDGET_TYPE,null," UserId=? ",new String[]{mUser.getUserId()},null,null,null);
             while (cursor.moveToNext()){
                 String BudegetTypeId = cursor.getString(cursor.getColumnIndex("BudegetTypeId"));
                 String note = cursor.getString(cursor.getColumnIndex("note"));
