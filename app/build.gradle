@@ -35,4 +35,7 @@ dependencies {
     implementation 'com.github.Othershe:CalendarView:1.2.1'
     compile project(path: ':MPChartLib')
     implementation files('libs/Msc.jar')
+    implementation 'net.sourceforge.jexcelapi:jxl:2.6.12'
+
+
 }
