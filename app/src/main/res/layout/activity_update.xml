@@ -158,8 +158,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_margin="10dp"
         android:visibility="gone"
+        android:layout_margin="10dp"
         >
         <TextView
             android:layout_width="150dp"
@@ -195,8 +195,17 @@
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:textColor="@android:color/black"
-        android:text="注册"
+        android:text="更新"
         android:textSize="25dp"
         android:id="@+id/reg_btn"
+        />
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:textColor="@android:color/black"
+        android:text="取消"
+        android:textSize="25dp"
+        android:id="@+id/reg_cancle_btn"
         />
 </LinearLayout>

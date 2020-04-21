@@ -35,6 +35,7 @@
         <activity android:name=".RegisterActivity"></activity>
         <activity android:name=".AddTypeActivity"></activity>
         <activity android:name=".VoiceActivity"/>
+        <activity android:name=".UpdateActivity"/>
     </application>
 
 </manifest>

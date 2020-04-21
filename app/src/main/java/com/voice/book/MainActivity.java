@@ -1,35 +1,61 @@
 package com.voice.book;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.ActivityCompat;
+import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.PopupWindow;
 
+import com.voice.book.bean.Budget;
+import com.voice.book.data.DBManger;
 import com.voice.book.fragment.AddFragment;
 import com.voice.book.fragment.ChartFragment;
 import com.voice.book.fragment.DetaildFragment;
+import com.voice.book.util.ExcelUtil;
 import com.voice.book.util.FragmentUtils;
+import com.voice.book.view.MenuView;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class MainActivity extends BaseActivtiy {
-
+    private Button mMenuBtn;
     private BottomNavigationView mBottomMenu;
-
+    private MenuView mMenuView;
+    private ImageView mHeadBtn;
+    private Uri mCutUri;
+    public static MainActivity _this;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         requestPermissions();
         init();
-
+        _this = this;
 
     }
 
     public void init(){
+        mMenuBtn = findViewById(R.id.menu_btn);
         mBottomMenu = findViewById(R.id.bottom_menu);
         mBottomMenu.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -38,8 +64,20 @@ public class MainActivity extends BaseActivtiy {
                 return true;
             }
         });
+        mMenuView = new MenuView(this);
 
         mBottomMenu.setSelectedItemId(R.id.bottom_menu_garage);
+        mMenuBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                PopupWindow popupWindow = new PopupWindow(mMenuView, ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);//参数为1.View 2.宽度 3.高度
+                popupWindow.setOutsideTouchable(true);//设置点击外部区域可以取消popupWindow
+                popupWindow.showAsDropDown(mMenuBtn);//设置popupWindow显示,并且告诉它显示在那个View下面
+            }
+        });
+
+        mHeadBtn = findViewById(R.id.title_head_btn);
 
     }
 
@@ -90,5 +128,101 @@ public class MainActivity extends BaseActivtiy {
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            switch (requestCode) {
+                case 1: //从相册图片后返回的uri
+                    //启动裁剪
+                    startActivityForResult(CutForPhoto(data.getData()),2);
+                    break;
+                case 2:
+                    try {
+                        //获取裁剪后的图片，并显示出来
+                        Bitmap bitmap = BitmapFactory.decodeStream(
+                                getContentResolver().openInputStream(mCutUri));
+                        mHeadBtn.setImageBitmap(bitmap);
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+            }
+        }
+    }
+
+    /**
+     * 图片裁剪
+     * @param uri
+     * @return
+     */
+    @NonNull
+    private Intent CutForPhoto(Uri uri) {
+        try {
+            //直接裁剪
+            Intent intent = new Intent("com.android.camera.action.CROP");
+            //设置裁剪之后的图片路径文件
+            File cutfile = new File(Environment.getExternalStorageDirectory().getPath(),
+                    "cutcamera.png"); //随便命名一个
+            if (cutfile.exists()){ //如果已经存在，则先删除,这里应该是上传到服务器，然后再删除本地的，没服务器，只能这样了
+                cutfile.delete();
+            }
+            cutfile.createNewFile();
+            //初始化 uri
+            Uri imageUri = uri; //返回来的 uri
+            Uri outputUri = null; //真实的 uri
+            outputUri = Uri.fromFile(cutfile);
+            mCutUri = outputUri;
+            // crop为true是设置在开启的intent中设置显示的view可以剪裁
+            intent.putExtra("crop",true);
+            // aspectX,aspectY 是宽高的比例，这里设置正方形
+            intent.putExtra("aspectX",1);
+            intent.putExtra("aspectY",1);
+            //设置要裁剪的宽高
+            intent.putExtra("outputX", 200); //200dp
+            intent.putExtra("outputY",200);
+            intent.putExtra("scale",true);
+            //如果图片过大，会导致oom，这里设置为false
+            intent.putExtra("return-data",false);
+            if (imageUri != null) {
+                intent.setDataAndType(imageUri, "image/*");
+            }
+            if (outputUri != null) {
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, outputUri);
+            }
+            intent.putExtra("noFaceDetection", true);
+            //压缩图片
+            intent.putExtra("outputFormat", Bitmap.CompressFormat.JPEG.toString());
+            return intent;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public void exportExcel(){
+        String filePath = Environment.getExternalStorageDirectory() + "/AndroidExcelDemo";
+        File file = new File(filePath);
+        if (!file.exists()) {
+            file.mkdirs();
+        }
+
+
+        String excelFileName = "/demo.xls";
+
+
+        String[] title = {"类型", "数目", "时间"};
+        String sheetName = "demoSheetName";
+
+
+        filePath = filePath + excelFileName;
+        List<Budget> mAllBudgets = DBManger.getInstance(this).getAllBudgetData();
+
+        ExcelUtil.initExcel(filePath, title);
+
+
+        ExcelUtil.writeObjListToExcel(mAllBudgets, filePath, getBaseContext());
     }
 }

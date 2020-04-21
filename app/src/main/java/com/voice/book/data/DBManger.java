@@ -73,8 +73,7 @@ public class DBManger {
         try{
             ContentValues values = new ContentValues();
             values.put("UserName",user.getUserName());
-            values.put("Sex",user.getSex());
-            values.put("Telephone",user.getTelephone());
+            values.put("Password",user.getPassword());
             SQLiteDatabase db = mDBHelper.getWritableDatabase();
             int code = db.update(SQLiteDbHelper.TAB_USER,values,"UserId =?",new String[]{user.getUserId()+""});
             listener.onSuccess();
@@ -140,6 +139,25 @@ public class DBManger {
         insertBudgetType(budgetType);
     }
 
+    public void updateBudget(Budget budget){
+        try{
+
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        ContentValues values = new ContentValues();
+        values.put("BudegetId",getRandomBudgetId());
+        values.put("date",budget.getDate());
+        values.put("type",budget.getType());
+        values.put("BudegetTypeId",budget.getBudegetTypeId());
+        values.put("note",budget.getNote());
+        values.put("num",budget.getNum());
+        SQLiteDatabase db = mDBHelper.getWritableDatabase();
+        int code = db.update(SQLiteDbHelper.TAB_BUDGET,values,"BudegetId =?",new String[]{budget.getBudegetId()+""});
+        int x = code;
+    }
+
     //添加收支数据
     public void insertBudget(Budget budge,IListener listener){
         try{
@@ -189,6 +207,38 @@ public class DBManger {
             strRand += String.valueOf((int)(Math.random() * 10)) ;
         }
         return strRand;
+    }
+
+    //获取所有的收支记录
+    public List<Budget> getAllBudgetData(){
+        List<Budget> budgets = new ArrayList<>();
+        try{
+            SQLiteDatabase db = mDBHelper.getWritableDatabase();
+            Cursor cursor = db.query(SQLiteDbHelper.TAB_BUDGET,null,null,null,null,null,null);
+            while (cursor.moveToNext()){
+                String BudegetId = cursor.getString(cursor.getColumnIndex("BudegetId"));
+                String date = cursor.getString(cursor.getColumnIndex("date"));
+                String type = cursor.getString(cursor.getColumnIndex("type"));
+                String BudegetTypeId = cursor.getString(cursor.getColumnIndex("BudegetTypeId"));
+                String note = cursor.getString(cursor.getColumnIndex("note"));
+                String num = cursor.getString(cursor.getColumnIndex("num"));
+
+                Budget budget = new Budget();
+                budget.setBudegetTypeId(BudegetTypeId);
+                budget.setBudegetId(BudegetId);
+                budget.setType(type);
+                budget.setNote(note);
+                budget.setNum(num);
+                budget.setDate(date);
+
+                budgets.add(budget);
+            }
+
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return budgets;
     }
 
     //获取所有的日期的汇总数据
@@ -359,6 +409,17 @@ public class DBManger {
             e.printStackTrace();
         }
     }
+
+    public void deleteBudegetByBudget(Budget budget){
+        try{
+            SQLiteDatabase db = mDBHelper.getWritableDatabase();
+            int x = db.delete(SQLiteDbHelper.TAB_BUDGET,"BudegetId =?",new String[]{budget.getBudegetId()});
+            db.close();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
 
     public interface IListener{
         public void onSuccess();

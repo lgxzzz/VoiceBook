@@ -5,23 +5,23 @@
     android:background="@android:color/holo_blue_bright"
     >
 
-    <Button
-        android:id="@+id/title_back_btn"
+    <ImageView
+        android:id="@+id/title_head_btn"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
-        android:layout_margin="3dp"
-        android:background="@drawable/touxiang"
+        android:layout_margin="5dp"
+        android:src="@drawable/touxiang"
         />
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="..."
+    <Button
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:textColor="@android:color/white"
-        android:textSize="25dp"
-        android:id="@+id/title_content"
+        android:id="@+id/menu_btn"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
+        android:background="@drawable/caidan"
+        android:layout_margin="5dp"
         />
 </RelativeLayout>

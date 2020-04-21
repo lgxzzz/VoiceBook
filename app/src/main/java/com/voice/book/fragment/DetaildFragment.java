@@ -1,31 +1,33 @@
 package com.voice.book.fragment;
 
-import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatDialogFragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.voice.book.R;
-import com.voice.book.adpater.DailySummaryAdapter;
-import com.voice.book.adpater.SummaryAdapter;
+import com.voice.book.adpater.BudgetAdapter;
 import com.voice.book.bean.Budget;
-import com.voice.book.bean.DailySummary;
 import com.voice.book.data.DBManger;
 import com.voice.book.util.DateUtil;
+import com.voice.book.view.BudgetUpdateDialog;
 import com.voice.book.view.DatePickDialog;
 import com.voice.book.view.LeftSwipeMenuRecyclerView;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,12 +41,19 @@ public class DetaildFragment extends AppCompatDialogFragment{
     private DatePickDialog mDatePickDialog;
 
     private LeftSwipeMenuRecyclerView mDailyListview;
-    private SummaryAdapter mAdapter;
+//    private SummaryAdapter mAdapter;
 
     private Handler mHandler= new Handler();
 
-    private List<DailySummary> mAlldailySummaries = new ArrayList<>();
-    private List<DailySummary> mSelectDateSummaries = new ArrayList<>();
+//    private List<DailySummary> mAlldailySummaries = new ArrayList<>();
+//    private List<DailySummary> mSelectDateSummaries = new ArrayList<>();
+
+    private BudgetAdapter mBudgetAdapter;
+    private List<Budget> mAllBudgets = new ArrayList<>();
+    private List<Budget> mSelectDateBudgets = new ArrayList<>();
+
+    private BudgetUpdateDialog mDialog;
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view =  inflater.inflate(R.layout.fragement_detail, container, false);
@@ -93,6 +102,14 @@ public class DetaildFragment extends AppCompatDialogFragment{
                 });
             }
         });
+
+        mDialog = new BudgetUpdateDialog(getContext(),R.layout.dialog_buget_update,true,true);
+        mDialog.setlistener(new BudgetUpdateDialog.IOnSureListener() {
+            @Override
+            public void onSure() {
+                initAllData();
+            }
+        });
     };
 
 
@@ -100,8 +117,10 @@ public class DetaildFragment extends AppCompatDialogFragment{
         mHandler.post(new Runnable() {
             @Override
             public void run() {
-                mAlldailySummaries.clear();
-                mAlldailySummaries = DBManger.getInstance(getContext()).getAllDailyData();
+//                mAlldailySummaries.clear();
+//                mAlldailySummaries = DBManger.getInstance(getContext()).getAllDailyData();
+                mAllBudgets.clear();
+                mAllBudgets = DBManger.getInstance(getContext()).getAllBudgetData();
                 refresListByMonth(DateUtil.getCurrentMonthStr());
                 refreshDataByMonth(DateUtil.getCurrentMonthStr());
             }
@@ -112,36 +131,78 @@ public class DetaildFragment extends AppCompatDialogFragment{
     public void refreshDataByMonth(String select_date){
         int income = 0;
         int expense = 0;
-        for (int i=0;i<mAlldailySummaries.size();i++){
-            DailySummary summary = mAlldailySummaries.get(i);
-            List<Budget> budgets = summary.getmBudgets();
-            String date = summary.getDate();
+//        for (int i=0;i<mAlldailySummaries.size();i++){
+//            DailySummary summary = mAlldailySummaries.get(i);
+//            List<Budget> budgets = summary.getmBudgets();
+//            String date = summary.getDate();
+//            if (date.contains(select_date)){
+//                int in = summary.getIncome();
+//                int ex = summary.getExpense();
+//                income = in+income;
+//                expense = ex + expense;
+//            }
+//        }
+        for (int i=0;i<mAllBudgets.size();i++){
+            Budget budget = mAllBudgets.get(i);
+            String date = budget.getDate();
+            String type = budget.getType();
             if (date.contains(select_date)){
-                int in = summary.getIncome();
-                int ex = summary.getExpense();
-                income = in+income;
-                expense = ex + expense;
+                if (type.equals("收入")){
+                    income = Integer.parseInt(budget.getNum())+income;
+                }else{
+                    expense = Integer.parseInt(budget.getNum())+expense;
+                }
             }
         }
         mIncomeTv.setText(income+"元");
         mExpenseTv.setText(expense+"元");
-
     }
 
     //根据月份查询收入支出
     public void refresListByMonth(String select_date){
-        mSelectDateSummaries.clear();
-        for (int i=0;i<mAlldailySummaries.size();i++){
-            DailySummary summary = mAlldailySummaries.get(i);
-            List<Budget> budgets = summary.getmBudgets();
-            String date = summary.getDate();
+//        mSelectDateSummaries.clear();
+//        for (int i=0;i<mAlldailySummaries.size();i++){
+//            DailySummary summary = mAlldailySummaries.get(i);
+//            List<Budget> budgets = summary.getmBudgets();
+//            String date = summary.getDate();
+//            if (date.contains(select_date)){
+//                mSelectDateSummaries.add(summary);
+//            }
+//        }
+//        mDailyListview.setLayoutManager(new LinearLayoutManager(getContext()));
+//        mAdapter = new SummaryAdapter(getContext(),mSelectDateSummaries);
+//        mDailyListview.setAdapter(mAdapter);
+//        mDailyListview.setOnItemActionListener(new LeftSwipeMenuRecyclerView.OnItemActionListener() {
+//            //点击
+//            @Override
+//            public void OnItemClick(int position) {
+//                Toast.makeText(getContext(),"Click"+position,Toast.LENGTH_SHORT).show();
+//            }
+//            //置顶
+//            @Override
+//            public void OnItemTop(int position) {
+//
+//            }
+//            //删除
+//            @Override
+//            public void OnItemDelete(int position) {
+//                DBManger.getInstance(getContext()).deleteBudegetByDialy(mSelectDateSummaries.get(position));
+//
+//                initAllData();
+//            }
+//        });
+
+        mSelectDateBudgets.clear();
+        for (int i=0;i<mAllBudgets.size();i++){
+            Budget budget = mAllBudgets.get(i);
+            String date = budget.getDate();
             if (date.contains(select_date)){
-                mSelectDateSummaries.add(summary);
+                mSelectDateBudgets.add(budget);
             }
         }
         mDailyListview.setLayoutManager(new LinearLayoutManager(getContext()));
-        mAdapter = new SummaryAdapter(getContext(),mSelectDateSummaries);
-        mDailyListview.setAdapter(mAdapter);
+        mBudgetAdapter = new BudgetAdapter(getContext(),mSelectDateBudgets);
+        mDailyListview.setAdapter(mBudgetAdapter);
         mDailyListview.setOnItemActionListener(new LeftSwipeMenuRecyclerView.OnItemActionListener() {
             //点击
             @Override
@@ -151,15 +212,19 @@ public class DetaildFragment extends AppCompatDialogFragment{
             //置顶
             @Override
             public void OnItemTop(int position) {
+                mDialog.setBudget(mSelectDateBudgets.get(position));
+                mDialog.show();
 
             }
             //删除
             @Override
             public void OnItemDelete(int position) {
-                DBManger.getInstance(getContext()).deleteBudegetByDialy(mSelectDateSummaries.get(position));
+                DBManger.getInstance(getContext()).deleteBudegetByBudget(mSelectDateBudgets.get(position));
 
                 initAllData();
             }
         });
     }
+
+
 }

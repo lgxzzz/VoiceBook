@@ -11,7 +11,9 @@ import android.widget.LinearLayout;
 import android.widget.Scroller;
 import android.widget.TextView;
 
+import com.voice.book.adpater.BudgetAdapter;
 import com.voice.book.adpater.SummaryAdapter;
+import com.voice.book.bean.Budget;
 
 /**
  * Created by Administrator on 2016/8/16.
@@ -81,7 +83,7 @@ public class LeftSwipeMenuRecyclerView extends RecyclerView {
                         return false;
                     }
                     //获得这个view的ViewHolder
-                    SummaryAdapter.Holder holder = (SummaryAdapter.Holder) getChildViewHolder(view);
+                    BudgetAdapter.Holder holder = (BudgetAdapter.Holder) getChildViewHolder(view);
                     //获得这个view的position
                     mPosition = holder.getAdapterPosition();
                     //获得这个view的整个布局

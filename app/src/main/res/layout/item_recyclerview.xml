@@ -34,10 +34,12 @@
         <TextView
             android:id="@+id/tvTop"
             android:layout_width="100dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:background="#00ff00"
-            android:text="top"
-            android:visibility="gone"
+            android:text="修改"
+            android:textSize="20dp"
+            android:layout_gravity="center"
+            android:gravity="center"
             />
     </LinearLayout>
 </RelativeLayout>
