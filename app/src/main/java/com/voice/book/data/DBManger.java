@@ -90,12 +90,18 @@ public class DBManger {
     //注册用户
     public void registerUser(User user,IListener listener){
         try{
+            SQLiteDatabase db = mDBHelper.getWritableDatabase();
+            Cursor cursor = db.rawQuery("select * from UserInfo where UserName =? ",new String[]{user.getUserName()});
+            if (cursor.moveToFirst()){
+                listener.onError("用户名已经被注册！");
+                return;
+            }
+
             String userid = getRandomUserID();
             ContentValues values = new ContentValues();
             values.put("UserName",user.getUserName());
             values.put("Password",user.getPassword());
             values.put("UserId",userid);
-            SQLiteDatabase db = mDBHelper.getWritableDatabase();
             long code = db.insert(SQLiteDbHelper.TAB_USER,null,values);
             mUser = new User();
             mUser.setUserId(userid);

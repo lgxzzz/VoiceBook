@@ -160,7 +160,7 @@ public class RegisterActivity extends AppCompatActivity {
 
                     @Override
                     public void onError(String error) {
-                        Toast.makeText(RegisterActivity.this,"注册失败！",Toast.LENGTH_LONG).show();
+                        Toast.makeText(RegisterActivity.this,error,Toast.LENGTH_LONG).show();
                     }
                 });
             }
