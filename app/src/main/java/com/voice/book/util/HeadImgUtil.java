@@ -46,7 +46,7 @@ public class HeadImgUtil {
             options.inSampleSize=(int)7.5; /*图片长宽方向缩小倍数*/
             options.inJustDecodeBounds=false;
 
-            File file = new File(sdpath+filename);
+            File file = new File(sdpath,filename);
             Uri uri = Uri.fromFile(file);
             bitmap =BitmapFactory.decodeStream(context.getContentResolver().openInputStream(uri), null, options);
 
@@ -55,4 +55,5 @@ public class HeadImgUtil {
         }
         return bitmap;
     }
+
 }

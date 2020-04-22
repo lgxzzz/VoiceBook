@@ -89,7 +89,7 @@ public class MainActivity extends BaseActivtiy {
         mHeadBtn = findViewById(R.id.title_head_btn);
         mUser = DBManger.getInstance(this).mUser;
         //获取保存的头像
-        Bitmap bitmap = HeadImgUtil.getHeadBitmap(this);
+        Bitmap bitmap =  DBManger.getInstance(getApplicationContext()).getHeadImg();
         if (bitmap!=null){
             mHeadBtn.setImageBitmap(bitmap);
         }
@@ -160,7 +160,7 @@ public class MainActivity extends BaseActivtiy {
                                 getContentResolver().openInputStream(mCutUri));
                         mHeadBtn.setImageBitmap(bitmap);
                         //保存头像
-                        HeadImgUtil.saveBitmap(bitmap);
+                        DBManger.getInstance(getApplicationContext()).saveHeadImg(bitmap);
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
                     }
